@@ -7,10 +7,11 @@ import {
   For,
   Index,
 } from "solid-js";
+import { API_BASE_URL } from "../../constants";
 
 const getListDatabases = async () => {
   try {
-    const result = await fetch("http://localhost:3000/graphql", {
+    const result = await fetch(API_BASE_URL, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
