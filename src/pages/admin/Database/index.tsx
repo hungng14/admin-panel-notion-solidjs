@@ -52,7 +52,7 @@ const getListDataOfDatabase = async (
       keys,
     };
   } catch (error) {
-    console.log('error', error);
+    console.log("error", error);
     return {
       list: [],
       keys: [],
@@ -69,7 +69,15 @@ const Database: Component<{}> = (props) => {
 
   return (
     <AdminLayout>
-      <h1 class="text-2xl font-bold">List</h1>
+      <div class="flex justify-between gap-4">
+        <h1 class="text-2xl font-bold">List</h1>
+        <a
+          href={`/admin/database/${params.databaseId}/add`}
+          class="focus:outline-none text-white bg-green-700 hover:bg-green-800 focus:ring-4 focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2 dark:bg-green-600 dark:hover:bg-green-700 dark:focus:ring-green-800"
+        >
+          Add
+        </a>
+      </div>
       <div class="w-full h-[1px] bg-gray-400 my-4"></div>
       <div class="relative overflow-x-auto shadow-md sm:rounded-lg">
         {data.loading ? (
@@ -109,7 +117,11 @@ const Database: Component<{}> = (props) => {
                 </For>
               ) : (
                 <tr>
-                  <td><h2 class="text-2xl py-4 px-2">There no data is displayed</h2></td>
+                  <td>
+                    <h2 class="text-2xl py-4 px-2">
+                      There no data is displayed
+                    </h2>
+                  </td>
                 </tr>
               )}
             </tbody>

@@ -34,3 +34,35 @@ export const getListDatabases = async (): Promise<ListDatabases> => {
     return [];
   }
 };
+
+
+export const getAddPropertiesOfDatabase = async (databaseId: string): Promise<Record<string, any>> => {
+  try {
+    const result = await fetch(API_BASE_URL, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        NotionClientName: getClientAccountName(),
+      },
+      body: JSON.stringify({
+        query: `{
+          getAddProperties(databaseId: "${databaseId}") {
+              id
+              object
+              properties
+              title {
+                  plain_text
+              }
+              description {
+                  plain_text
+              }
+            }
+          }`,
+      }),
+    }).then((res) => res.json());
+    console.log('result.data.getAddProperties', result.data.getAddProperties);
+    return result.data.getAddProperties;
+  } catch (error) {
+    return [];
+  }
+};
