@@ -7,8 +7,9 @@ import {
   createSignal,
   For,
 } from "solid-js";
-import { API_BASE_URL } from "../../../constants";
-import { notionRenderValue } from "../../../utils/notionRenderValue";
+import { API_BASE_URL } from "@/constants";
+import { notionRenderValue } from "@/utils/notionRenderValue";
+import { getValue } from "@/services/storage";
 
 const ArrowIcon = () => (
   <svg
@@ -31,21 +32,13 @@ const ArrowIcon = () => (
 const Accordion: Component<{ currentDatabase?: Record<string, any> }> = (
   props
 ) => {
-  const properties = createMemo(() => {
-    if (props.currentDatabase) {
-      return Object.keys(props.currentDatabase.properties);
-    }
-    return [];
+  const currentRelationId = createMemo(() => {
+    return props.currentDatabase?.relationId;
   });
-  const currentDatabaseId = createMemo(() => {
-    return props.currentDatabase?.id;
+  const currentRelationName = createMemo(() => {
+    return props.currentDatabase?.name;
   });
-  const initValueProperties = properties().reduce(
-    (obj: Record<string, { hidden: boolean }>, key: string) => (
-      (obj[key] = { hidden: false }), obj
-    ),
-    {}
-  );
+  const initValueProperties = {};
   const [configListProperties, setConfigListProperties] =
     createSignal<Record<string, { hidden: boolean }>>(initValueProperties);
   const [configAddProperties, setConfigAddProperties] =
@@ -53,48 +46,53 @@ const Accordion: Component<{ currentDatabase?: Record<string, any> }> = (
   const [configEditProperties, setConfigEditProperties] =
     createSignal<Record<string, { hidden: boolean }>>(initValueProperties);
 
-  const getConfiguration = async (databaseId: string) => {
+  const getConfiguration = async (relationId: string) => {
     try {
       const result = await fetch(API_BASE_URL, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          NotionClientName: getClientAccountName(),
+          userId: getValue("user")?.id,
         },
         body: JSON.stringify({
           query: `{
-                    getPropertiesConfiguration(databaseId:"${databaseId}") {
-                        id
-                        properties
-                        object
-                        parent
+            getPropertiesConfigOfRelation(relationId:"${relationId}") {
+                        property_names
+                        configuration {
+                          id
+                          properties
+                          object
+                          parent
+                        }
                     }
                   }`,
         }),
       }).then((res) => res.json());
-      return result.data?.getPropertiesConfiguration;
+      return result.data?.getPropertiesConfigOfRelation;
     } catch (error) {
       console.log("error", error);
       return null;
     }
   };
 
-  const [configuration] = createResource(currentDatabaseId, () =>
-    getConfiguration(currentDatabaseId())
+  const [configuration] = createResource(currentRelationId, () =>
+    getConfiguration(currentRelationId())
   );
 
   createEffect(() => {
     if (configuration.loading) {
-      console.log("loading");
+      // console.log("loading");
     } else {
       const detail = configuration();
+      // console.log('detail', detail);
       if (detail) {
-        let dataConfig = notionRenderValue(detail.properties?.Configuration);
+        let dataConfig = notionRenderValue(detail.configuration?.properties?.configuration);
         try {
           dataConfig = JSON.parse(dataConfig);
         } catch (error) {
           dataConfig = {};
         }
+        // console.log('dataConfig', dataConfig);
         setConfigListProperties((prevValue) => ({
           ...prevValue,
           ...(dataConfig.listProperties || {}),
@@ -125,19 +123,20 @@ const Accordion: Component<{ currentDatabase?: Record<string, any> }> = (
         headers: {
           "Content-Type": "application/json",
           Accept: "application/json",
-          NotionClientName: getClientAccountName(),
+          userId: getValue("user")?.id,
         },
         body: JSON.stringify({
-          query: `mutation configProperties($configPropertiesInput: ConfigPropertiesInput!) { 
-            configProperties(configPropertiesInput: $configPropertiesInput) {
+          query: `mutation configPropertiesRelation($configPropertiesRelationInput: ConfigPropertiesRelationInput!) { 
+            configPropertiesRelation(configPropertiesRelationInput: $configPropertiesRelationInput) {
                 id 
                 object
               }
             }
           `,
           variables: {
-            configPropertiesInput: {
-              databaseId: currentDatabaseId(),
+            configPropertiesRelationInput: {
+              relationName: currentRelationName(),
+              relationId: currentRelationId(),
               configuration: configToString,
             },
           },
@@ -147,7 +146,7 @@ const Accordion: Component<{ currentDatabase?: Record<string, any> }> = (
       if (result.data) {
         alert("Save successfully");
       } else {
-        throw new Error(result.errors?.[0]?.message || 'Save failed');
+        throw new Error(result.errors?.[0]?.message || "Save failed");
       }
     } catch (error) {
       console.log("error", error);
@@ -194,7 +193,7 @@ const Accordion: Component<{ currentDatabase?: Record<string, any> }> = (
                 </div>
               </div>
               <div class="w-full h-[1px] bg-gray-400 my-4"></div>
-              <For each={properties()}>
+              <For each={configuration().property_names}>
                 {(key) => (
                   <div
                     class="grid mb-4"
@@ -253,7 +252,7 @@ const Accordion: Component<{ currentDatabase?: Record<string, any> }> = (
                 </div>
               </div>
               <div class="w-full h-[1px] bg-gray-400 my-4"></div>
-              <For each={properties()}>
+              <For each={configuration().property_names}>
                 {(key) => (
                   <div
                     class="grid mb-4"
@@ -313,7 +312,7 @@ const Accordion: Component<{ currentDatabase?: Record<string, any> }> = (
                 </div>
               </div>
               <div class="w-full h-[1px] bg-gray-400 my-4"></div>
-              <For each={properties()}>
+              <For each={configuration().property_names}>
                 {(key) => (
                   <div
                     class="grid mb-4"
