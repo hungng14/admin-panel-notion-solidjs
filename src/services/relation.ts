@@ -1,6 +1,39 @@
 import { API_BASE_URL } from "../constants";
 import { getValue } from "./storage";
 
+export const createRelation = async (data: {
+  name: string;
+  properties: Record<string, any>[];
+}) => {
+  try {
+    const result = await fetch(API_BASE_URL, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        userId: `${getValue("user")?.id}`,
+      },
+      body: JSON.stringify({
+        query: `mutation createRelation($createRelationInput: CreateRelationInput!){
+          createRelation(createRelationInput: $createRelationInput) {
+            id
+            properties
+          }
+        }`,
+        variables: {
+          createRelationInput: {
+            pageId: `${getValue("user")?.id}`,
+            ...data,
+          },
+        },
+      }),
+    }).then((res) => res.json());
+    return result.data.createRelation;
+  } catch (error: any) {
+    console.log("error", error);
+    throw new Error(error.message);
+  }
+};
+
 export const getListRelationsOfUser = async () => {
   try {
     const result = await fetch(API_BASE_URL, {

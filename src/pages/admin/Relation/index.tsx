@@ -97,7 +97,7 @@ const Relation: Component<{}> = (props) => {
                     </th>
                   )}
                 </Index>
-                <th>Action</th>
+                <th class="px-6 py-3 w-52">Action</th>
               </tr>
             </thead>
             <tbody>

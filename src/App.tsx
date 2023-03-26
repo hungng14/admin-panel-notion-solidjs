@@ -7,6 +7,8 @@ import Start from "./pages/start";
 import ProtectedComponent from "./components/base/ProtectedComponent";
 import AddRecordRelation from "./pages/admin/Relation/Add";
 import EditRecordRelation from "./pages/admin/Relation/Edit";
+import ListRelations from "./pages/admin/ConfigRelation";
+import AddRelation from "./pages/admin/ConfigRelation/Add";
 const App: Component = () => {
   return (
     <>
@@ -18,6 +20,8 @@ const App: Component = () => {
           <Route path={"/admin/relation/:relationId/add"} component={AddRecordRelation} />
           <Route path={"/admin/relation/:relationId/edit/:recordId"} component={EditRecordRelation} />
           <Route path={"/admin/setting"} component={Setting} />
+          <Route path={"/admin/config-relation"} component={ListRelations} />
+          <Route path={"/admin/config-relation/add"} component={AddRelation} />
         </Route>
         <Route path="*" element={()=> <div>Page Not found!!!</div>} />
       </Routes>
