@@ -1,63 +1,9 @@
 import AdminLayout from "@/components/layout";
 import { Component, createResource, For, Index } from "solid-js";
 import { A, useParams } from "@solidjs/router";
-import { API_BASE_URL } from "@/constants";
 import { notionRenderValue } from "@/utils/notionRenderValue";
+import { getListDataOfRelation, ListDatabase } from "@/services/relation";
 
-type ListDatabase = {
-  keys: string[];
-  list: Record<string, any>[];
-};
-
-const getListDataOfRelation = async (
-  relationId: string
-): Promise<ListDatabase> => {
-  try {
-    const result = await (
-      await fetch(API_BASE_URL, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          query: `{
-            getListRecordsOfRelation(relationId: "${relationId}") {
-            object
-            has_more
-            results {
-                id
-                cover
-                created_by
-                created_time
-                icon
-                last_edited_by
-                object
-                last_edited_time
-                parent
-                properties
-                url
-            }
-          }
-        }
-        `,
-        }),
-      })
-    ).json();
-    const list = result.data?.getListRecordsOfRelation?.results || [];
-    const keys: string[] = Object.keys(list[0]?.properties || {});
-    console.log(keys);
-    return {
-      list,
-      keys,
-    };
-  } catch (error) {
-    console.log("error", error);
-    return {
-      list: [],
-      keys: [],
-    };
-  }
-};
 
 const Relation: Component<{}> = (props) => {
   const params = useParams();

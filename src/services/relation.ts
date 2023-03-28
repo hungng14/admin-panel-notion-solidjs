@@ -54,9 +54,9 @@ export const getDetailRelation = async (relationId: string) => {
         }`,
       }),
     }).then((res) => res.json());
-    if(!result.data.getDetailRelation) {
-      console.log('error', result);
-      throw new Error('Something went wrong');
+    if (!result.data.getDetailRelation) {
+      console.log("error", result);
+      throw new Error("Something went wrong");
     }
     return result.data.getDetailRelation;
   } catch (error: any) {
@@ -270,10 +270,65 @@ export const deleteRecordOfRelation = async (recordId: string) => {
         }`,
       }),
     }).then((res) => res.json());
-    console.log("resu;t", result);
     return result.data.deleteRecordToRelation;
   } catch (error: any) {
     console.log("error", error);
     throw new Error(error.message);
+  }
+};
+
+export type ListDatabase = {
+  keys: string[];
+  list: Record<string, any>[];
+};
+
+export const getListDataOfRelation = async (
+  relationId: string
+): Promise<ListDatabase> => {
+  try {
+    const result = await (
+      await fetch(API_BASE_URL, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          userId: `${getValue("user")?.id}`,
+        },
+        body: JSON.stringify({
+          query: `{
+            getListRecordsOfRelation(relationId: "${relationId}") {
+            object
+            has_more
+            results {
+                id
+                cover
+                created_by
+                created_time
+                icon
+                last_edited_by
+                object
+                last_edited_time
+                parent
+                properties
+                url
+            }
+          }
+        }
+        `,
+        }),
+      })
+    ).json();
+    const list = result.data?.getListRecordsOfRelation?.results || [];
+    const keys: string[] = Object.keys(list[0]?.properties || {});
+    console.log(keys);
+    return {
+      list,
+      keys,
+    };
+  } catch (error) {
+    console.log("error", error);
+    return {
+      list: [],
+      keys: [],
+    };
   }
 };
