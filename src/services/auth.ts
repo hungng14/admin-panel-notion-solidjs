@@ -108,3 +108,4 @@ export const signUp = async (data: {
     throw new Error(error.message || "Sign up failed");
   }
 };
+
