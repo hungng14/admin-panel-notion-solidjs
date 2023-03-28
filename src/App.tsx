@@ -9,6 +9,7 @@ import AddRecordRelation from "./pages/admin/Relation/Add";
 import EditRecordRelation from "./pages/admin/Relation/Edit";
 import ListRelations from "./pages/admin/ConfigRelation";
 import AddRelation from "./pages/admin/ConfigRelation/Add";
+import ViewRelation from "./pages/admin/ConfigRelation/View";
 const App: Component = () => {
   return (
     <>
@@ -22,6 +23,7 @@ const App: Component = () => {
           <Route path={"/admin/setting"} component={Setting} />
           <Route path={"/admin/config-relation"} component={ListRelations} />
           <Route path={"/admin/config-relation/add"} component={AddRelation} />
+          <Route path={"/admin/config-relation/:relationId/view"} component={ViewRelation} />
         </Route>
         <Route path="*" element={()=> <div>Page Not found!!!</div>} />
       </Routes>

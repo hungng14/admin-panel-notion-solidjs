@@ -46,7 +46,24 @@ const ListRelations: Component<{}> = (props) => {
                           {item.name}
                         </A>
                       </td>
-                      <td></td>
+                      <td class="px-6 py-3">
+                        <A href={`/admin/config-relation/${item.relationId}/view`} class="block w-fit text-gray-900 bg-white border border-gray-300 focus:outline-none hover:bg-gray-100 focus:ring-4 focus:ring-gray-200 font-medium rounded-lg text-sm p-1 dark:bg-gray-800 dark:text-white dark:border-gray-600 dark:hover:bg-gray-700 dark:hover:border-gray-600 dark:focus:ring-gray-700">
+                          <svg
+                            fill="currentColor"
+                            viewBox="0 0 20 20"
+                            xmlns="http://www.w3.org/2000/svg"
+                            aria-hidden="true"
+                            class="flex-shrink-0 w-4 h-4 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white"
+                          >
+                            <path d="M10 12.5a2.5 2.5 0 100-5 2.5 2.5 0 000 5z"></path>
+                            <path
+                              clip-rule="evenodd"
+                              fill-rule="evenodd"
+                              d="M.664 10.59a1.651 1.651 0 010-1.186A10.004 10.004 0 0110 3c4.257 0 7.893 2.66 9.336 6.41.147.381.146.804 0 1.186A10.004 10.004 0 0110 17c-4.257 0-7.893-2.66-9.336-6.41zM14 10a4 4 0 11-8 0 4 4 0 018 0z"
+                            ></path>
+                          </svg>
+                        </A>
+                      </td>
                     </tr>
                   )}
                 </For>

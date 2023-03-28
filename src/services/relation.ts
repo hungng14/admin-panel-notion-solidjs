@@ -34,6 +34,37 @@ export const createRelation = async (data: {
   }
 };
 
+export const getDetailRelation = async (relationId: string) => {
+  try {
+    const result = await fetch(API_BASE_URL, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        userId: `${getValue("user")?.id}`,
+      },
+      body: JSON.stringify({
+        query: `{ getDetailRelation(relationId: "${relationId}") {
+            id
+            name
+            object
+            properties
+            created_time
+            last_edited_time
+          }
+        }`,
+      }),
+    }).then((res) => res.json());
+    if(!result.data.getDetailRelation) {
+      console.log('error', result);
+      throw new Error('Something went wrong');
+    }
+    return result.data.getDetailRelation;
+  } catch (error: any) {
+    console.log("error", error);
+    throw new Error(error.message);
+  }
+};
+
 export const getListRelationsOfUser = async () => {
   try {
     const result = await fetch(API_BASE_URL, {
