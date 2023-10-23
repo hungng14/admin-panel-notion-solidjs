@@ -1,4 +1,4 @@
-import { getClientAccountName } from "../../services/clientName";
+import { getClientAccountName } from "@/services/clientName";
 import { A } from "@solidjs/router";
 import {
   createEffect,
@@ -7,43 +7,14 @@ import {
   For,
   Index,
 } from "solid-js";
-import { API_BASE_URL } from "../../constants";
-
-const getListDatabases = async () => {
-  try {
-    const result = await fetch(API_BASE_URL, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        NotionClientName: getClientAccountName(),
-      },
-      body: JSON.stringify({
-        query: `{
-            databases {
-              object
-              results {
-                  id
-                  title {
-                      plain_text
-                  }
-                  description {
-                      plain_text
-                  }
-                  object
-                  properties
-              }
-          }
-        }`,
-      }),
-    }).then((res) => res.json());
-    return result.data.databases.results;
-  } catch (error) {
-    return [];
-  }
-};
+import { API_BASE_URL } from "@/constants";
+import { getValue } from "@/services/storage";
+import { getListRelationsOfUser } from "@/services/relation";
 
 const Sidebar = () => {
-  const [list, { refetch, mutate }] = createResource(getListDatabases);
+  const [relations, { refetch, mutate }] = createResource(
+    getListRelationsOfUser
+  );
   return (
     <aside
       id="logo-sidebar"
@@ -70,17 +41,17 @@ const Sidebar = () => {
               <span class="ml-3">Dashboard</span>
             </A>
           </li>
-          {list.loading ? (
+          {relations.loading ? (
             <h3 class="p-2 text-gray-200 dark:text-whit dark:hover:bg-gray-700">
               Loading...
             </h3>
           ) : (
             <>
-              <Index each={list()}>
+              <Index each={relations()}>
                 {(item, idx) => (
                   <li>
                     <A
-                      href={`/admin/database/${item().id}`}
+                      href={`/admin/relation/${item().relationId}`}
                       class="flex items-center p-2 text-base font-normal text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700"
                     >
                       <svg
@@ -98,7 +69,7 @@ const Sidebar = () => {
                         <path d="M16.5 6.5h-1v8.75a1.25 1.25 0 102.5 0V8a1.5 1.5 0 00-1.5-1.5z" />
                       </svg>
                       <span class="flex-1 ml-3 whitespace-nowrap">
-                        {item().title[0].plain_text}
+                        {item().name}
                       </span>
                     </A>
                   </li>
@@ -125,6 +96,27 @@ const Sidebar = () => {
                 ></path>
               </svg>
               <span class="ml-3">Setting</span>
+            </A>
+          </li>
+          <li>
+            <A
+              href="/admin/config-relation"
+              class="flex items-center p-2 text-base font-normal text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700"
+            >
+              <svg
+                fill="currentColor"
+                viewBox="0 0 20 20"
+                xmlns="http://www.w3.org/2000/svg"
+                aria-hidden="true"
+                class="flex-shrink-0 w-6 h-6 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white"
+              >
+                <path
+                  clip-rule="evenodd"
+                  fill-rule="evenodd"
+                  d="M10 1c3.866 0 7 1.79 7 4s-3.134 4-7 4-7-1.79-7-4 3.134-4 7-4zm5.694 8.13c.464-.264.91-.583 1.306-.952V10c0 2.21-3.134 4-7 4s-7-1.79-7-4V8.178c.396.37.842.688 1.306.953C5.838 10.006 7.854 10.5 10 10.5s4.162-.494 5.694-1.37zM3 13.179V15c0 2.21 3.134 4 7 4s7-1.79 7-4v-1.822c-.396.37-.842.688-1.306.953-1.532.875-3.548 1.369-5.694 1.369s-4.162-.494-5.694-1.37A7.009 7.009 0 013 13.179z"
+                />
+              </svg>
+              <span class="ml-3">Config Relation</span>
             </A>
           </li>
         </ul>

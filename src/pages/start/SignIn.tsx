@@ -8,7 +8,8 @@ type Props = {
 };
 
 const SignIn: Component<Props> = (props) => {
-  const [userName, setUserName] = createSignal("");
+  const [email, setEmail] = createSignal("");
+  const [password, setPassword] = createSignal("");
   const navigate = useNavigate();
   let refUserName;
   const [isLogging, setIsLogging] = createSignal(false);
@@ -17,12 +18,12 @@ const SignIn: Component<Props> = (props) => {
       e.preventDefault();
       if(isLogging()) return;
       setIsLogging(true);
-      await signIn({ userName: userName() });
+      await signIn({ email: email(), password: password() });
       alert("Sign in successfully");
       navigate("/admin", { replace: true });
     } catch (error: any) {
       console.log("error", error);
-      alert(error?.message || "Account name invalid");
+      alert(error?.message || "Email or password invalid");
       setIsLogging(false);
     }
   };
@@ -39,17 +40,36 @@ const SignIn: Component<Props> = (props) => {
               for="account-name"
               class="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
             >
-              Your Account Name
+              Email
             </label>
             <input
               name="email"
               id="account-name"
               class="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-              placeholder="Your Account Name"
+              placeholder="Your Email"
               ref={refUserName}
-              value={userName()}
+              value={email()}
               onChange={(e) => {
-                setUserName(e.currentTarget.value);
+                setEmail(e.currentTarget.value);
+              }}
+            />
+          </div>
+          <div>
+            <label
+              for="password"
+              class="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+            >
+              Password
+            </label>
+            <input
+              type="password"
+              name="password"
+              id="password"
+              placeholder="••••••••"
+              class="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+              value={password()}
+              onChange={(e) => {
+                setPassword(e.currentTarget.value);
               }}
             />
           </div>

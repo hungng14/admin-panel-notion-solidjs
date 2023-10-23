@@ -1,4 +1,4 @@
-import { getListDatabases, ListDatabases } from "../../../services/database";
+import { getListRelationsOfUser } from "@/services/relation";
 import {
   Component,
   createEffect,
@@ -13,7 +13,7 @@ type Props = {
 
 const SelectTable: Component<Props> = (props) => {
   const [currentIdx, setCurrentIdx] = createSignal(-1);
-  const [data, { refetch, mutate }] = createResource(getListDatabases);
+  const [data, { refetch, mutate }] = createResource(getListRelationsOfUser);
 
   return (
     <div>
@@ -26,7 +26,7 @@ const SelectTable: Component<Props> = (props) => {
           </h3>
         ) : (
           <div class="flex flex-wrap gap-6">
-            <Index each={data() as ListDatabases}>
+            <Index each={data()}>
               {(item, idx) => (
                 <div
                   onClick={() => {
@@ -42,7 +42,7 @@ const SelectTable: Component<Props> = (props) => {
                     ["border-4  border-[#e1e994] scale-105"]: currentIdx() === idx,
                   }}
                 >
-                  {item().title[0].plain_text}
+                  {item().name}
                 </div>
               )}
             </Index>

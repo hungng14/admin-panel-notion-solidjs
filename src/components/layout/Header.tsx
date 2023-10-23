@@ -1,6 +1,6 @@
-import { clearClientAccountName } from "../../services/clientName";
 import { A } from "@solidjs/router";
 import { createSignal } from "solid-js";
+import { clearAuthorize } from "@/services/authorize";
 
 const Header = () => {
   const [openUserMenu, setOpenUserMenu] = createSignal(false);
@@ -62,10 +62,11 @@ const Header = () => {
                   openUserMenu() ? "block" : "hidden"
                 }`}
                 id="dropdown-user"
+                style={{"min-width": '200px'}}
               >
-                <div class="px-4 py-3" role="none">
+                {/* <div class="px-4 py-3" role="none">
                   <p class="text-sm text-gray-900 dark:text-white" role="none">
-                    Neil Sims
+                    Logged In
                   </p>
                   <p
                     class="text-sm font-medium text-gray-900 truncate dark:text-gray-300"
@@ -73,12 +74,12 @@ const Header = () => {
                   >
                     neil.sims@flowbite.com
                   </p>
-                </div>
+                </div> */}
                 <ul class="py-1" role="none">
                   <li>
                     <A
                       href="/"
-                      onClick={() => clearClientAccountName()}
+                      onClick={() => clearAuthorize()}
                       class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-600 dark:hover:text-white"
                       role="menuitem"
                     >

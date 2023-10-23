@@ -1,11 +1,12 @@
-import { API_BASE_URL } from "../constants";
-import { setClientAccountName } from "./clientName";
+import { API_BASE_URL } from "@/constants";
+import { setValue } from "./storage";
 
 export type SignInResult = {
   accessToken: string;
 };
 export const signIn = async (data: {
-  userName: string;
+  email: string;
+  password: string;
 }): Promise<SignInResult> => {
   try {
     const result = await fetch(API_BASE_URL, {
@@ -14,21 +15,58 @@ export const signIn = async (data: {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        query: `mutation signIn($signInUserInput: SignInUserInput!) { 
-                    signIn(signInUserInput: $signInUserInput) {
+        query: `mutation signInV2($signInUserInput: SignInUserV2Input!) { 
+          signInV2(signInUserInput: $signInUserInput) {
+                        id
                         accessToken
                       }
                     }
                   `,
         variables: {
           signInUserInput: {
-            userName: data.userName,
+            email: data.email,
+            password: data.password,
           },
         },
       }),
     }).then((res) => res.json());
-    if (result.data?.signIn) {
-      setClientAccountName(data.userName);
+    if (result.data?.signInV2) {
+      setValue('user', result.data?.signInV2);
+      return result.data.signInV2;
+    }
+    throw new Error(result.errors?.[0]?.message || "Email or password invalid");
+  } catch (error: any) {
+    throw new Error(error.message || "Sign in failed");
+  }
+};
+
+export const verifyUser = async (data: {
+  email: string;
+  code: string;
+}): Promise<SignInResult> => {
+  try {
+    const result = await fetch(API_BASE_URL, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        query: `mutation verifyUser($verifyUser: VerifyUserV2Input!) { 
+                      verifyUser(verifyUser: $verifyUser) {
+                        id
+                      }
+                    }
+                  `,
+        variables: {
+          verifyUser: {
+            email: data.email,
+            code: data.code,
+          },
+        },
+      }),
+    }).then((res) => res.json());
+    if (result.data?.verifyUser) {
+      setValue('userId', result.data.verifyUser.id);
       return result.data.signIn;
     }
     throw new Error(result.errors?.[0]?.message || "Account Name not found");
@@ -38,8 +76,8 @@ export const signIn = async (data: {
 };
 
 export const signUp = async (data: {
-  userName: string;
-  secretKey: string;
+  email: string;
+  password: string;
 }): Promise<SignInResult> => {
   try {
     const result = await fetch(API_BASE_URL, {
@@ -48,28 +86,26 @@ export const signUp = async (data: {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        query: `mutation signUp($signUpUserInput: SignUpUserInput!) { 
-                    signUp(signUpUserInput: $signUpUserInput) {
-                        accessToken
-                        id
-                        object
-                        }
+        query: `mutation signUpV2($signUpUserInput: SignUpUserV2Input!) { 
+                      signUpV2(signUpUserInput: $signUpUserInput) {
+                        success
+                      }
                     }
                 `,
         variables: {
           signUpUserInput: {
-            userName: data.userName,
-            secretKey: data.secretKey,
+            email: data.email,
+            password: data.password,
           },
         },
       }),
     }).then((res) => res.json());
-    if (result.data?.signUp) {
-      setClientAccountName(data.userName);
-      return result.data.signUp;
+    if (result.data?.signUpV2) {
+      return result.data.signUpV2;
     }
     throw new Error(result.errors?.[0]?.message || "Sign up failed");
   } catch (error: any) {
     throw new Error(error.message || "Sign up failed");
   }
 };
+

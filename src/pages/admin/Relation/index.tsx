@@ -1,75 +1,31 @@
-import AdminLayout from "../../../components/layout";
+import AdminLayout from "@/components/layout";
 import { Component, createResource, For, Index } from "solid-js";
-import { useParams } from "@solidjs/router";
-import { API_BASE_URL, NOTION_CLIENT_NAME } from "../../../constants";
-import { notionRenderValue } from "../../../utils/notionRenderValue";
-import { getClientAccountName } from "../../../services/clientName";
+import { A, useParams } from "@solidjs/router";
+import { notionRenderValue } from "@/utils/notionRenderValue";
+import { getListDataOfRelation, ListDatabase } from "@/services/relation";
 
-type ListDatabase = {
-  keys: string[];
-  list: Record<string, any>[];
-};
 
-const getListDataOfDatabase = async (
-  databaseId: string
-): Promise<ListDatabase> => {
-  try {
-    const result = await (
-      await fetch(API_BASE_URL, {
-        method: "POST",
-        headers: {
-          NotionClientName: getClientAccountName(),
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          query: `{
-          one_database(id: "${databaseId}") {
-            object
-            results {
-                id
-                cover
-                created_by
-                created_time
-                icon
-                last_edited_by
-                object
-                last_edited_time
-                parent
-                properties
-                url
-            }
-          }
-        }
-        `,
-        }),
-      })
-    ).json();
-    const list = result.data?.one_database?.results || [];
-    const keys: string[] = Object.keys(list[0]?.properties || {});
-    console.log(keys);
-    return {
-      list,
-      keys,
-    };
-  } catch (error) {
-    console.log('error', error);
-    return {
-      list: [],
-      keys: [],
-    };
-  }
-};
-
-const Database: Component<{}> = (props) => {
+const Relation: Component<{}> = (props) => {
   const params = useParams();
   const [data, { refetch }] = createResource(
-    () => params.databaseId,
-    getListDataOfDatabase
+    () => params.relationId,
+    getListDataOfRelation
   );
 
   return (
     <AdminLayout>
-      <h1 class="text-2xl font-bold">List</h1>
+      <div class="flex justify-between gap-4">
+        <h1 class="text-2xl font-bold">List</h1>
+        {!data.loading && (
+          <A
+            href={`/admin/relation/${params.relationId}/add`}
+            class="focus:outline-none text-white bg-green-700 hover:bg-green-800 focus:ring-4 focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2 dark:bg-green-600 dark:hover:bg-green-700 dark:focus:ring-green-800"
+          >
+            Add
+          </A>
+        )}
+      </div>
+
       <div class="w-full h-[1px] bg-gray-400 my-4"></div>
       <div class="relative overflow-x-auto shadow-md sm:rounded-lg">
         {data.loading ? (
@@ -87,6 +43,7 @@ const Database: Component<{}> = (props) => {
                     </th>
                   )}
                 </Index>
+                <th class="px-6 py-3 w-52">Action</th>
               </tr>
             </thead>
             <tbody>
@@ -104,12 +61,23 @@ const Database: Component<{}> = (props) => {
                           </th>
                         )}
                       </Index>
+                      <th>
+                        <A
+                          href={`/admin/relation/${params.relationId}/edit/${item.id}`}
+                        >
+                          Edit
+                        </A>
+                      </th>
                     </tr>
                   )}
                 </For>
               ) : (
                 <tr>
-                  <td><h2 class="text-2xl py-4 px-2">There no data is displayed</h2></td>
+                  <td>
+                    <h2 class="text-2xl py-4 px-2">
+                      There no data is displayed
+                    </h2>
+                  </td>
                 </tr>
               )}
             </tbody>
@@ -120,4 +88,4 @@ const Database: Component<{}> = (props) => {
   );
 };
 
-export default Database;
+export default Relation;
