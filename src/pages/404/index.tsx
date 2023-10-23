@@ -13,14 +13,14 @@ const PageNotFound: Component<{}> = (props) => {
             Sorry, we couldn't find this page.
           </p>
           <p class="mt-4 mb-8 dark:text-gray-400">
-            But don't worry, you can find plenty of other things on our homepage.
+            But don't worry, you can find plenty of other things on our home page.
           </p>
           <A
             rel="noopener noreferrer"
             href="/"
             class="px-8 py-3 font-semibold rounded dark:bg-violet-400 dark:text-gray-900"
           >
-            Back to homepage
+            Back to home page
           </A>
         </div>
       </div>
